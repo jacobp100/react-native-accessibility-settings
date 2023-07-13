@@ -1,18 +1,20 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-accessibility-settings';
+import { useAccessibilitySettings } from 'react-native-accessibility-settings';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
+  const accessibilitySettings = useAccessibilitySettings();
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      {Object.entries(accessibilitySettings)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([key, value]) => (
+          <Text key={key}>
+            {key}: {value ? '✅' : '❌'}
+          </Text>
+        ))}
     </View>
   );
 }
@@ -20,7 +22,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    padding: 20,
+    alignItems: 'flex-start',
     justifyContent: 'center',
   },
   box: {
