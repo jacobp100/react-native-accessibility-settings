@@ -6,7 +6,7 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-  return NO;
+  return YES;
 }
 
 - (NSDictionary *)constantsToExport
@@ -52,8 +52,16 @@ RCT_EXPORT_MODULE()
 
 - (void)accessibilityDataDidChange
 {
-  [self sendEventWithName:@"change"
-                     body:[self data]];
+  __weak __typeof(self) weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    __strong __typeof(self) strongSelf = weakSelf;
+    if (strongSelf == nil) {
+      return;
+    }
+
+    [strongSelf sendEventWithName:@"change"
+                             body:[strongSelf data]];
+  });
 }
 
 - (NSDictionary *)data
